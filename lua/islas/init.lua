@@ -1,34 +1,7 @@
---Incremental live completion (note: this is now a default on master)
-vim.o.inccommand = 'nosplit'
-
---Set highlight on search
-vim.o.hlsearch = false
-
---Make line numbers default
-vim.wo.number = true
-
---Do not save when switching buffers (note: this is now a default on master)
-vim.o.hidden = true
-
---Enable mouse mode
-vim.o.mouse = 'a'
-
 --Enable break indent
-vim.o.breakindent = true
-
---Save undo history
-vim.opt.undofile = true
-
---Case insensitive searching UNLESS /C or capital in search
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
---Decrease update time
-vim.o.updatetime = 250
-vim.wo.signcolumn = 'yes'
+--vim.o.breakindent = true
 
 --Set colorscheme (order is important here)
-vim.o.termguicolors = true
 vim.g.onedark_terminal_italics = 2
 vim.cmd [[colorscheme onedark]]
 
@@ -59,11 +32,7 @@ vim.api.nvim_exec(
   false
 )
 
--- Y yank until the end of line  (note: this is now a default on master)
-vim.api.nvim_set_keymap('n', 'Y', 'y$', { noremap = true })
-
 --Map blankline
-
 vim.opt.list = true
 vim.opt.listchars:append("space:⋅")
 vim.opt.listchars:append("eol:↴")
@@ -111,7 +80,8 @@ require'telescope'.load_extension('project')
 require("telescope").load_extension('file_browser')
 --Add leader shortcuts
 vim.api.nvim_set_keymap('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sf', [[<cmd>lua require('telescope.builtin').find_files()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>sa', [[<cmd>lua require('telescope.builtin').find_files()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>sf', [[<cmd>lua require('telescope.builtin').git_files()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>sb', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>sh', [[<cmd>lua require('telescope.builtin').help_tags()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>st', [[<cmd>lua require('telescope.builtin').tags()<CR>]], { noremap = true, silent = true })
@@ -119,7 +89,14 @@ vim.api.nvim_set_keymap('n', '<leader>sd', [[<cmd>lua require('telescope.builtin
 vim.api.nvim_set_keymap('n', '<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>so', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n',"<space>fb",":Telescope file_browser path=%:p:h<CR>",{ noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>fb',':Telescope file_browser path=%:p:h<CR>',{ noremap = true })
+vim.api.nvim_set_keymap('n', '<F5>', ':DapContinue<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<F10>', [[<cmd>lua require('dapui').step_over()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<F11>', [[<cmd>lua require('dapui').step_into()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<F12>', [[<cmd>lua require('dapui').step_out()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>tb', ':DapToggleBreakpoint<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>tu', [[<cmd>lua require('dapui').toggle()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>tr', [[<cmd>lua require('dapui').repl_open()<CR>]], { noremap = true, silent = true })
 
 require'nvim-web-devicons'.setup {
  default = true;
@@ -202,7 +179,7 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'v', '<leader>ca', '<cmd>lua vim.lsp.buf.range_code_action()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'v', '<leader>ca', '<cmd>lua vim.lsp.buf.range_code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>e', '<cmd>lua vim.lsp.diagnostic.show()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
@@ -346,7 +323,15 @@ dap.configurations.php = {
   }
 }
 
-vim.fn.sign_define('DapBreakpoint', {text='🔴', texthl='', linehl='', numhl=''})
+vim.highlight.create('DapBreakpoint', { ctermbg=0, guifg='#993939', guibg='#31353f' }, false)
+vim.highlight.create('DapLogPoint', { ctermbg=0, guifg='#61afef', guibg='#31353f' }, false)
+vim.highlight.create('DapStopped', { ctermbg=0, guifg='#98c379', guibg='#31353f' }, false)
+
+vim.fn.sign_define('DapBreakpoint', { text='', texthl='DapBreakpoint', linehl='DapBreakpoint', numhl='DapBreakpoint' })
+vim.fn.sign_define('DapBreakpointCondition', { text='ﳁ', texthl='DapBreakpoint', linehl='DapBreakpoint', numhl='DapBreakpoint' })
+vim.fn.sign_define('DapBreakpointRejected', { text='', texthl='DapBreakpoint', linehl='DapBreakpoint', numhl= 'DapBreakpoint' })
+vim.fn.sign_define('DapLogPoint', { text='', texthl='DapLogPoint', linehl='DapLogPoint', numhl= 'DapLogPoint' })
+vim.fn.sign_define('DapStopped', { text='', texthl='DapStopped', linehl='DapStopped', numhl= 'DapStopped' })
 
 require("nvim-dap-virtual-text").setup()
 
@@ -360,7 +345,4 @@ dap.listeners.before.event_terminated["dapui_config"] = function()
 end
 dap.listeners.before.event_exited["dapui_config"] = function()
   dapui.close()
-end
-local on_attach = function(_, bufnr)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>t', '<Cmd>lua require(""dapui").toggle()<CR>', opts)
 end

@@ -14,6 +14,7 @@ Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
 Plug 'hrsh7th/cmp-nvim-lsp-document-symbol'
 Plug 'L3MON4D3/LuaSnip'
 Plug 'saadparwaiz1/cmp_luasnip'
+Plug 'rafamadriz/friendly-snippets'
 Plug 'onsails/lspkind-nvim'
 
 Plug 'joshdick/onedark.vim'

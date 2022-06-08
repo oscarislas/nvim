@@ -91,9 +91,9 @@ vim.api.nvim_set_keymap('n', '<leader>so', [[<cmd>lua require('telescope.builtin
 vim.api.nvim_set_keymap('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>fb',':Telescope file_browser path=%:p:h<CR>',{ noremap = true })
 vim.api.nvim_set_keymap('n', '<F5>', ':DapContinue<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<F10>', [[<cmd>lua require('dapui').step_over()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<F11>', [[<cmd>lua require('dapui').step_into()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<F12>', [[<cmd>lua require('dapui').step_out()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<F10>', ':DapStepOver<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<F11>', ':DapStepInto<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<F12>', ':DapStepOut<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>tb', ':DapToggleBreakpoint<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>tu', [[<cmd>lua require('dapui').toggle()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>tr', [[<cmd>lua require('dapui').repl_open()<CR>]], { noremap = true, silent = true })
@@ -203,37 +203,30 @@ end
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
+require("luasnip.loaders.from_vscode").lazy_load()
 
 -- luasnip setup
 local luasnip = require 'luasnip'
+luasnip.filetype_extend("php", {"php"})
 
 -- nvim-cmp setup
-local cmp = require 'cmp'
-cmp.setup {
+local cmp = require'cmp'
+cmp.setup({
   snippet = {
     expand = function(args)
       require('luasnip').lsp_expand(args.body)
     end,
   },
-  enabled = function ()
-    return vim.api.nvim_buf_get_option(0, "buftype") ~= "prompt"
-      or require("cmp_dap").is_dap_buffer()
-  end,
-  sources = {
-    { name = 'dap' },
-    { name = 'nvim_lsp_signature_help' },
+  window = {
+    -- completion = cmp.config.window.bordered(),
+    -- documentation = cmp.config.window.bordered(),
   },
-  mapping = {
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-e>'] = cmp.mapping.close(),
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
+    ['<C-o>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
     ['<Tab>'] = function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -252,18 +245,31 @@ cmp.setup {
         fallback()
       end
     end,
-  },
-  sources = {
+  }),
+  sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
-  },
-}
-require'cmp'.setup.cmdline('/', {
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp_document_symbol' }
   }, {
-    { name = 'buffer' }
+    { name = 'buffer' },
   })
+})
+
+cmp.setup.cmdline('/', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp_document_symbol' },
+    }, {
+      { name = 'buffer' },
+    })
+})
+
+cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
 })
 
 require'lspconfig'.phpactor.setup{

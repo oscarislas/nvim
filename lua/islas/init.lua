@@ -59,6 +59,7 @@ require('gitsigns').setup {
 }
 
 -- Telescope
+local fb_actions = require "telescope".extensions.file_browser.actions
 require('telescope').setup {
   defaults = {
     previewer = true,
@@ -67,11 +68,29 @@ require('telescope').setup {
     file_previewer = require'telescope.previewers'.vim_buffer_cat.new,
     grep_previewer = require'telescope.previewers'.vim_buffer_vimgrep.new,
     qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
+    path_display={"smart"},
     mappings = {
-      i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
+        i = {
+            ['<C-u>'] = false,
+            ['<C-d>'] = false,
+        },
+    },
+    extensions = {
+        file_browser = {
+            theme = "ivy",
+            -- disables netrw and use telescope-file-browser in its place
+            hijack_netrw = true,
+            mappings = {
+               ["i"] = {
+                -- your custom insert mode mappings
+                  ["<leader>cr"] = fb_actions.create,
+               },
+               ["n"] = {
+                -- your custom normal mode mappings
+                  ["<leader>cr"] = fb_actions.create,
+               },
+            },
+        },
     },
   },
 }

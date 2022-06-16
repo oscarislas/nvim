@@ -87,6 +87,8 @@ set updatetime=300
 set shortmess+=c
 " a list of groups can be found at `:help nvim_tree_highlight`
 highlight NvimTreeFolderIcon guibg=blue
+" yank using clipboard
+set clipboard+=unnamedplus
 
 set completeopt=menu,menuone,noselect
 let g:rainbow_active = 1
